@@ -1,0 +1,53 @@
+body {
+  font-family: sans-serif;
+}
+body,
+html {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+*,
+*::before,
+*::after {
+  padding: 0px;
+  margin: 0px;
+  box-sizing: border-box;
+}
+.toolbar {
+  /* TODO: Would be cool to enter from bottom after scene renders */
+  padding: 10px 30px;
+  height: 55px;
+  background: #fff;
+  border-radius: 300px; /* absurdly large for ease */
+  position: absolute;
+  left: 50%;
+  bottom: 30px;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  gap: 8px;
+  /* Trying out neumorphism shadows for the first time 🎉 */
+  box-shadow: 12px 12px 16px 0 rgba(0, 0, 0, 0.05),
+    -8px -8px 12px 0 rgba(255, 255, 255, 0.5);
+}
+.box {
+  cursor: pointer;
+  &:hover div {
+    transform: translateY(-20px);
+  }
+  & > div {
+    transition: 0.2s;
+    background: red;
+    aspect-ratio: 1;
+    height: 100%;
+  }
+}
+canvas {
+  width: 100%;
+  height: 100%;
+  &:focus {
+    outline: none;
+    border: none;
+  }
+}
