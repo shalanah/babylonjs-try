@@ -1,6 +1,5 @@
 import { Vector3, Mesh, VertexData } from "@babylonjs/core";
 
-// Thought rounded square might be less pointy :)
 // Source: https://www.babylonjs-playground.com/#14VFYX#0
 export const sampleSuperEllipsoid = (
   phi,
@@ -55,15 +54,15 @@ export const calculateNormal = (phi, beta, n1, n2, scaleX, scaleY, scaleZ) => {
   return normal;
 };
 
-export const createSuperEllipsoid = (
+export const createSuperEllipsoid = ({
   samples,
   n1,
   n2,
   scalex,
   scaley,
   scalez,
-  scene
-) => {
+  scene,
+}) => {
   var superello = new Mesh("superello", scene);
   var phi = 0.0,
     phi2 = 0.0,
