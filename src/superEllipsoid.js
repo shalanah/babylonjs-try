@@ -65,7 +65,7 @@ export const createSuperEllipsoid = ({
 }) => {
   var superello = new Mesh("superello", scene);
   var phi = 0.0,
-    phi2 = 0.0,
+    // phi2 = 0.0,
     beta = 0.0;
   var dB = (Math.PI * 2.0) / samples;
   var dP = (Math.PI * 2.0) / samples;
@@ -136,7 +136,7 @@ export const createSuperEllipsoid = ({
   shapeReturned.uvs = [];
   var indice = 0;
 
-  for (var i = 0; i < vertices.length; i++) {
+  for (let i = 0; i < vertices.length; i++) {
     shapeReturned.indices.push(indice++);
     shapeReturned.positions.push(vertices[i].x);
     shapeReturned.positions.push(vertices[i].y);
