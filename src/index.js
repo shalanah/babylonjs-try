@@ -13,7 +13,7 @@ import {
   Mesh,
   MeshBuilder,
 } from "@babylonjs/core";
-import { GridMaterial } from "@babylonjs/materials/Grid";
+import { GridMaterial } from "@babylonjs/materials";
 import "./styles.scss";
 import { rotate } from "./actions";
 import { createSuperEllipsoid } from "./superEllipsoid";
