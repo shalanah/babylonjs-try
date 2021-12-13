@@ -12,75 +12,68 @@ import {
   ActionManager,
   Mesh,
   MeshBuilder,
-  StateCondition,
 } from "@babylonjs/core";
 import { GridMaterial } from "@babylonjs/materials/Grid";
 import "./styles.scss";
-// import { rotate } from "./actions";
+import { rotate } from "./actions";
 import { createSuperEllipsoid } from "./superEllipsoid";
+import { ellipsoidData, createEllipsoidData } from "./constants";
 
-const ellipsoidData = [
-  {
-    position: [-2.5, 0, 0],
-    rotation: [0, 13.27, 0],
-    diffuseColor: [0, 0, 1],
-    ambientColor: [0, 0, 0.2],
-  },
-
-  {
-    position: [0, 0, 5],
-    rotation: [0, 21.7, 0],
-    diffuseColor: [0, 1, 0],
-    ambientColor: [0, 0.1, 0],
-  },
-  {
-    position: [2.5, 0, 0],
-    rotation: [0, -28.29, 0],
-    diffuseColor: [1, 0, 0],
-    ambientColor: [0.2, 0, 0],
-  },
-];
-const createEllipsoidData = {
-  samples: 48,
-  n1: 0.2,
-  n2: 0.2,
-  scalex: 0.45,
-  scaley: 0.45,
-  scalez: 0.45,
-};
+// TODO
+// - Add shadows
+// - Wrap in app or anonymous function possibly
+// - On window resize without distortion
+// - Look into whether or not to use state on meshes or just to create another object to track
 
 // Get canvas
 const canvas = document.querySelector("canvas");
 
 // Init Babylon
 const engine = new Engine(canvas, true);
+
+// Scene
 const scene = new Scene(engine);
-// scene.actionManager = new ActionManager(scene); // TODO: move to actions?
+scene.actionManager = new ActionManager(scene);
 scene.ambientColor = new Color3(1, 1, 1);
-scene.clearColor = bg;
+scene.clearColor = new Color3(0.93, 0.93, 0.93);
+
+// Camera
 const camera = new FreeCamera("camera1", new Vector3(0, 1.36, -7), scene);
 camera.rotation = new Vector3(9.3, 0.5, 0);
 camera.target = new Vector3(0, 1.2, -6);
 camera.attachControl(canvas, true);
 camera.invertRotation = true; // More natural for novices like me :)
+
+// Light
 const light = new HemisphericLight("light1", new Vector3(3, 5, 1), scene);
 light.intensity = 0.6;
 light.groundColor = new Color3(0.25, 0.25, 0.25);
 
-// Colors
-const bg = new Color3(0.93, 0.93, 0.93);
-const lineColor = new Color3(0.98, 0.98, 0.98);
+// Gridded Ground
+const ground = Mesh.CreateGround("ground", 100, 100, 2, scene);
+ground.position = new Vector3(0, -1, 0);
+const gridMat = new GridMaterial("gridMat", scene);
+gridMat.mainColor = new Color3(0.93, 0.93, 0.93);
+gridMat.lineColor = new Color3(0.96, 0.96, 0.96);
+ground.material = gridMat;
+ground.material.majorUnitFrequency = 1;
+ground.material.minorUnitVisibility = 0;
+ground.material.gridOffset = new Vector3(0.5, 0, 0);
 
-// Sphere
+// White material (sphere + cubes after hitting)
 var whiteMat = new StandardMaterial("mat-white", scene);
 whiteMat.diffuseColor = new Color3(0.95, 0.95, 0.95);
 whiteMat.ambientColor = new Color3(0.35, 0.35, 0.35);
+whiteMat.backFaceCulling = false;
+
+// Sphere
 const sphere = MeshBuilder.CreateSphere("sphere", { diameter: 1 }, scene);
 sphere.material = whiteMat;
 sphere.position = new Vector3(0, 0, -1);
+sphere.state = null; // Indicating not moving, either null, 0, 1, 2
 
-// Create ellipsoids
-// Not sure if there are performance implications about putting these into an array? (I'm new to Babylonjs)
+// Ellipsoids
+// *Not sure if there are performance implications by putting these into an array? ie Garbage Collection etc
 const ellipsoids = ellipsoidData.map(
   ({ position, rotation, diffuseColor, ambientColor }, i) => {
     const ellipsoid = createSuperEllipsoid({
@@ -94,57 +87,87 @@ const ellipsoids = ellipsoidData.map(
     ellipsoid.material = mat;
     ellipsoid.rotation = new Vector3(...rotation);
     ellipsoid.position = new Vector3(...position);
-    ellipsoid.state = "default";
-    // ellipsoid.state = "default"; // 'white' or 'rotate'
-    // Conditions
-    // ellipsoid.actionManager = new ActionManager(scene);
-    // const conditionDefault = new StateCondition(
-    //   ellipsoid.actionManager,
-    //   whiteMat,
-    //   "default"
-    // );
-    // const conditionHit = new StateCondition(
-    //   ellipsoid.actionManager,
-    //   light1,
-    //   "white"
-    // );
-    // const conditionHover = new StateCondition(
-    //   ellipsoid.actionManager,
-    //   rotate(scene, ellipsoid),
-    //   "rotate"
-    // );
+    ellipsoid.state = "default"; // Using this as just a prop... "default", "rotate", "active", "done"
     return ellipsoid;
   }
 );
 
-// Ground
-const ground = Mesh.CreateGround("ground", 100, 100, 2, scene);
-ground.position = new Vector3(0, -1, 0);
-const gridMat = new GridMaterial("gridMat", scene);
-gridMat.mainColor = bg;
-gridMat.lineColor = lineColor;
-ground.material = gridMat;
-ground.material.majorUnitFrequency = 1;
-ground.material.minorUnitVisibility = 0;
-ground.material.gridOffset = new Vector3(0.5, 0, 0);
-
+// Toolbar events
+// TODO: double check perf with putting elems into a var... another way to add less event listeners
+let angle; // Need this for later... angle towards next ellipsoid
 const boxes = document.getElementsByClassName("box");
-for (let i = 0, len = boxes.length; i < len; i++) {
-  // boxes[i].addEventListener("pointerenter", (e) => {
-  //   const state = ellipsoids[i].state;
-  //   if (state === "default") {
-  //     ellipsoids[i].state = "rotate";
-  //     rotate(scene, ellipsoids[i]);
-  //   }
-  // });
-  // boxes[i].addEventListener("pointerleave", (e) => {
-  //   const state = ellipsoids[i].state;
-  //   if (state === "rotate") {
-  //     ellipsoids[i].state = "default";
-  //     scene.actionManager.actions.pop(); // For now assuming that it is the last action in the list
-  //   }
-  // });
+const toolbarBoxesLength = boxes.length;
+for (let i = 0; i < toolbarBoxesLength; i++) {
+  // Hover rotate
+  boxes[i].addEventListener("pointerenter", (e) => {
+    const state = ellipsoids[i].state;
+    if (state === "default") {
+      ellipsoids[i].state = "rotate";
+      rotate(scene, ellipsoids[i]);
+    }
+  });
+  // Stop rotate (hover off)
+  boxes[i].addEventListener("pointerleave", (e) => {
+    const state = ellipsoids[i].state;
+    if (state === "rotate") {
+      // only stop rotate if from rotate state... not from "active" state
+      ellipsoids[i].state = "default";
+      scene.actionManager.actions.pop(); // For now assuming last action
+    }
+  });
+  // Click to move to ellipsoid
+  boxes[i].addEventListener("click", (e) => {
+    ellipsoids[i].state = "active";
+    sphere.state = i; // moving towards this box, otherwise null
+    const diffX = ellipsoids[i].position.x - sphere.position.x;
+    const diffZ = ellipsoids[i].position.z - sphere.position.z;
+    angle = Math.atan2(diffX, diffZ);
+    for (let j = 0; j < toolbarBoxesLength; j++) {
+      if (i === j) boxes[i].classList.add("active");
+      else boxes[j].classList.add("inactive");
+    }
+    canvas.classList.add("pointer-events-none");
+  });
 }
+
+// Quick and dirty way to reset... probably better to remove classes and reset positions.
+document.querySelector(".reset").addEventListener("click", () => {
+  window.location.reload();
+});
+document.querySelector(".restart").addEventListener("click", () => {
+  window.location.reload();
+});
+
+scene.registerBeforeRender(function () {
+  const ellipIndex = sphere.state;
+  if (ellipIndex !== null) {
+    // Collided
+    if (sphere.intersectsMesh(ellipsoids[ellipIndex], true)) {
+      // Change to white
+      ellipsoids[ellipIndex].material = whiteMat;
+      ellipsoids[ellipIndex].state = "done";
+      sphere.state = null;
+      // Stop movement
+      scene.actionManager.actions.pop(); // For now assuming last action
+      // Allow for canvas interactions
+      canvas.classList.remove("pointer-events-none");
+      // Remove toolbar active/inactive classes
+      for (let i = 0; i < toolbarBoxesLength; i++) {
+        boxes[i].classList.remove("active");
+        boxes[i].classList.remove("inactive");
+      }
+      // Show restart button if all boxes have been hit or "done"
+      boxes[ellipIndex].classList.add("done");
+      if (ellipsoids.every(({ state }) => state === "done")) {
+        document.querySelector(".restart").classList.add("enter");
+      }
+      return; // Don't move sphere any further
+    }
+    // Move toward the correct sphere
+    sphere.position.x += 0.023 * Math.sin(angle);
+    sphere.position.z += 0.023 * Math.cos(angle);
+  }
+});
 
 // Hide/show the Inspector
 // Shift+Ctrl+Alt+I
@@ -158,14 +181,14 @@ window.addEventListener("keydown", (e) => {
   }
 });
 
-// TODO: on window resize also rerender? Window gets distorted.
 // Run the main render loop
 let firstRender = false;
 engine.runRenderLoop(() => {
   scene.render();
+  // Animate-in toolbar after canvas is painted for the first time
   if (!firstRender) {
-    console.log("first render");
     firstRender = true;
     document.querySelector(".toolbar").classList.add("enter");
+    document.querySelector(".reset").classList.add("enter");
   }
 });

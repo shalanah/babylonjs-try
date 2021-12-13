@@ -3,15 +3,30 @@
   <head>
     <title>Parcel Sandbox</title>
     <meta charset="UTF-8" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@1,200&display=swap"
+      rel="stylesheet"
+    />
   </head>
-
   <body>
     <div id="app"></div>
     <canvas></canvas>
+    <button class="reset">
+      <svg viewBox="0 0 100 100">
+        <path
+          d="M50,27.13a24.08,24.08,0,0,0-17.33,7.41V26.37a1.5,1.5,0,0,0-3,0v12a1.5,1.5,0,0,0,1.5,1.5h12a1.5,1.5,0,0,0,0-3H34.59A21,21,0,1,1,29,51.13a1.5,1.5,0,1,0-3,0,24,24,0,1,0,24-24Z"
+        ></path>
+      </svg>
+    </button>
+    <button class="restart">
+      <span>Restart</span>
+    </button>
     <div class="toolbar">
-      <div class="box"><div></div></div>
-      <div class="box"><div></div></div>
-      <div class="box"><div></div></div>
+      <button class="box"><div></div></button>
+      <button class="box"><div></div></button>
+      <button class="box"><div></div></button>
     </div>
     <script src="src/index.js"></script>
   </body>
