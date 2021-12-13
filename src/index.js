@@ -24,6 +24,7 @@ import { ellipsoidData, createEllipsoidData } from "./constants";
 // - Wrap in app or anonymous function possibly
 // - On window resize without distortion
 // - Look into whether or not to use state on meshes or just to create another object to track
+// - Husband suggests as soon as sphere hits each cube a reindeer should appear and fly away 🦌
 
 // Get canvas
 const canvas = document.querySelector("canvas");
