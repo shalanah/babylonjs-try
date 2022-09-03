@@ -6,7 +6,7 @@ Using BabylonJS and VanillaJS (no jquery, bootstrap, or ui libraries), create a 
 
 ## Fun firsts
 
-- First time ever using BabylonJS
+First time ever using BabylonJS
 
 ## In action
 
@@ -14,6 +14,6 @@ TODO
 
 ## Limitations
 
-- Only developed with Desktop Chrome
+Only developed with Desktop Chrome
 
 
