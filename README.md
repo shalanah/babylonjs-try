@@ -10,7 +10,7 @@ First time ever using BabylonJS
 
 ## In action
 
-TODO
+https://user-images.githubusercontent.com/14183660/188287365-5c144cf7-51f5-4b2e-8129-802e08498f91.mp4
 
 ## Limitations
 
