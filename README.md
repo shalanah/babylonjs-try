@@ -14,6 +14,6 @@ TODO
 
 ## Limitations
 
-- Only developed and checked Desktop Chrome
+- Only developed with Desktop Chrome
 
 
